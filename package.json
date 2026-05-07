@@ -1,0 +1,61 @@
+{
+  "name": "@quizbase/client",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for QuizBase API — typed client, retry, RFC 9457 errors, telemetry hook. Generated from openapi.json.",
+  "license": "MIT",
+  "author": "Maciej Dzierżek",
+  "homepage": "https://quizbase.runriva.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maciejdzierzek/quizbase-sdk-ts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maciejdzierzek/quizbase-sdk-ts/issues"
+  },
+  "keywords": [
+    "quizbase",
+    "trivia",
+    "quiz",
+    "questions",
+    "api",
+    "sdk",
+    "typescript",
+    "multilingual"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "gen": "openapi-typescript https://quizbase.runriva.com/openapi.json -o src/types.gen.ts",
+    "gen:local": "openapi-typescript http://localhost:5190/openapi.json -o src/types.gen.ts",
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "openapi-typescript": "^7.4.4",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
