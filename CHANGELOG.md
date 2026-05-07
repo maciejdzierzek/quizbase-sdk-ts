@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.2.2...v0.2.3) (2026-05-07)
+
+
+### Bug Fixes
+
+* **ci:** pin npm@11.5.1 with --force to avoid self-upgrade module conflicts ([e6e3eb8](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/e6e3eb8ec50ea63c2e5a3f08af0628ac66fed11e))
+
 ## [0.2.2](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.2.1...v0.2.2) (2026-05-07)
 
 
