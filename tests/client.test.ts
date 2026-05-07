@@ -248,6 +248,7 @@ describe('integration (prod)', () => {
 	(skip ? it.skip : it)('hits prod /api/v1/stats', async () => {
 		const client = createClient({ apiKey: key ?? '' });
 		const result = await client.stats.get();
-		expect(result.data).toBeDefined();
+		expect(typeof result.total).toBe('number');
+		expect(result.total).toBeGreaterThan(0);
 	});
 });
