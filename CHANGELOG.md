@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.2.1...v0.2.2) (2026-05-07)
+
+
+### Bug Fixes
+
+* **ci:** upgrade npm to latest for OIDC Trusted Publishing support ([4f7f340](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/4f7f3406fcfd1c89038da31acaaef935f4744bfc))
+
 ## [0.2.1](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.2.0...v0.2.1) (2026-05-07)
 
 
