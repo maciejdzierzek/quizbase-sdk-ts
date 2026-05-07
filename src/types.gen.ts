@@ -220,7 +220,7 @@ export interface paths {
         };
         /**
          * List curated topics
-         * @description 2,184 curated topics with aliases and counts. Public, MV-backed.
+         * @description 2,184 curated topics with aliases and counts. Public, no API key required.
          */
         get: {
             parameters: {
@@ -1099,9 +1099,9 @@ export interface components {
             /** @example pl */
             language: string;
             category: components["schemas"]["CategoryRef"];
-            /** @description Display Layer (Plan 55) — `{slug, label}` per `?lang=`. */
+            /** @description Localized `{slug, label}` per `?lang=`. */
             subcategories: components["schemas"]["SlugLabel"][];
-            /** @description Display Layer — `{slug, label}` per `?lang=`. */
+            /** @description Localized `{slug, label}` per `?lang=`. */
             tags: components["schemas"]["SlugLabel"][];
             /**
              * @example [
@@ -1127,7 +1127,7 @@ export interface components {
             translator: "machine" | "human" | "native" | null;
             /** @description Optional explanation of the correct answer. */
             explanation: string | null;
-            /** @description Per-source / per-pipeline extras (enrich_meta, quizify_meta, regions_meta, rewrite_meta, distractor_validation, etc.). Shape varies; treat as forward-compatible storage. */
+            /** @description Forward-compatible container for stable per-source extras. Today exposes `subcategories: string[]` (also surfaced as the typed top-level `subcategories` field). Future stable fields land here additively. */
             extensions: {
                 [key: string]: unknown;
             };
@@ -1355,8 +1355,6 @@ export interface components {
             aliases: string[];
             /** @example 64977 */
             count: number;
-            /** @example null */
-            description: string | null;
         };
         MetaTopicsList: {
             /** @example 100 */
