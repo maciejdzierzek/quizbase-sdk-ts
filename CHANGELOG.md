@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.2.0...v0.2.1) (2026-05-07)
+
+
+### Bug Fixes
+
+* **ci:** publish in same workflow run as release-please tag creation ([b03ac15](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/b03ac15465742eabf0fc3905c18ecfe69c3f84f8))
+
 ## [0.2.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.1.0...v0.2.0) (2026-05-07)
 
 
