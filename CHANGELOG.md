@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.1.0...v0.2.0) (2026-05-07)
+
+
+### Features
+
+* regen types — drop topic.description, neutralize Question.extensions desc ([260e398](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/260e398d96d91f2e70bab7d23a5f223c34aecdbb))
+
 ## 0.1.0 (2026-05-07)
 
 Initial release. **0.x — API may change.** A 1.0 with stability commitment will follow ~6–8 weeks after public launch based on user feedback.
