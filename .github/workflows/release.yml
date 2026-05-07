@@ -37,7 +37,8 @@ jobs:
         with:
           version: 10
       # OIDC Trusted Publishing requires npm >= 11.5.1 — runner ships older.
-      - run: npm install -g npm@latest
+      # Use npm@11 explicitly to avoid self-upgrade dependency issues.
+      - run: npm install -g --force npm@11.5.1
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
