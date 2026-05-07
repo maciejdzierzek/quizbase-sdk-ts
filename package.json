@@ -1,6 +1,6 @@
 {
   "name": "@quizbase/client",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "TypeScript SDK for QuizBase API — typed client, retry, RFC 9457 errors, telemetry hook. Generated from openapi.json.",
   "license": "MIT",
   "author": "Maciej Dzierżek",
