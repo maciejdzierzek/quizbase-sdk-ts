@@ -36,6 +36,8 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 10
+      # OIDC Trusted Publishing requires npm >= 11.5.1 — runner ships older.
+      - run: npm install -g npm@latest
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
