@@ -36,6 +36,6 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      # Trusted Publishing via OIDC — no NPM_TOKEN required.
+      # Configured at https://www.npmjs.com/package/@quizbase/client/access (publisher: GitHub Actions, repo: maciejdzierzek/quizbase-sdk-ts, workflow: release.yml).
       - run: npm publish --provenance --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
