@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.3.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.2.3...v0.3.0) (2026-05-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* README snippets, JSDoc tooltips, and key examples no longer reference test/live key variants. Consumers copying these snippets must use qb_pk_* or qb_sk_* keys minted after Plan 105.
+* `apiKey.env` field removed from ApiKeyInfo. Consumers reading the env discriminator must drop it — there is no longer a test/live split (Plan 105 — flatten API key model).
+
+### Features
+
+* regenerate types from current /openapi.json ([dc72528](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/dc7252836d9afe03013cf3377cc5f3b2908cbe18))
+
+
+### Documentation
+
+* realign README + JSDoc with flat key model ([eccdcfd](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/eccdcfd613dbcab202565d77b22e63990ab9ead3))
+
+
+### Miscellaneous Chores
+
+* release 0.3.0 (override release-please major bump) ([dae7218](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/dae72185a735a2f249f738f7ebd9547138982602))
+
 ## [0.2.3](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.2.2...v0.2.3) (2026-05-07)
 
 
