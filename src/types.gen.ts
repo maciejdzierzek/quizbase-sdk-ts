@@ -13,7 +13,7 @@ export interface paths {
         };
         /**
          * List categories
-         * @description 24 top-level categories with localized names. Public, no API key required.
+         * @description 24 top-level categories with localized names.
          */
         get: {
             parameters: {
@@ -36,8 +36,8 @@ export interface paths {
                         "application/json": components["schemas"]["CategoriesResponse"];
                     };
                 };
-                /** @description Invalid query parameters. */
-                400: {
+                /** @description Missing, malformed, invalid, or revoked API key. */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -45,7 +45,16 @@ export interface paths {
                         "application/problem+json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Rate limit exceeded. */
+                /** @description IP not allowed (per-key allowlist). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Rate limit exceeded. See `Retry-After` header. */
                 429: {
                     headers: {
                         [name: string]: unknown;
@@ -82,7 +91,7 @@ export interface paths {
         };
         /**
          * Aggregate dataset stats
-         * @description Total questions, per-language, per-source, per-category counters. Public, cached.
+         * @description Total questions, per-language, per-source, per-category counters. Cached.
          */
         get: {
             parameters: {
@@ -105,8 +114,8 @@ export interface paths {
                         "application/json": components["schemas"]["StatsResponse"];
                     };
                 };
-                /** @description Invalid query parameters. */
-                400: {
+                /** @description Missing, malformed, invalid, or revoked API key. */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -114,7 +123,16 @@ export interface paths {
                         "application/problem+json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Rate limit exceeded. */
+                /** @description IP not allowed (per-key allowlist). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Rate limit exceeded. See `Retry-After` header. */
                 429: {
                     headers: {
                         [name: string]: unknown;
@@ -151,7 +169,7 @@ export interface paths {
         };
         /**
          * Supported languages
-         * @description Whitelist of `?lang=` values with native names and counts. Public.
+         * @description Whitelist of `?lang=` values with native names and counts.
          */
         get: {
             parameters: {
@@ -174,8 +192,8 @@ export interface paths {
                         "application/json": components["schemas"]["LanguagesResponse"];
                     };
                 };
-                /** @description Invalid query parameters. */
-                400: {
+                /** @description Missing, malformed, invalid, or revoked API key. */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -183,7 +201,16 @@ export interface paths {
                         "application/problem+json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Rate limit exceeded. */
+                /** @description IP not allowed (per-key allowlist). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Rate limit exceeded. See `Retry-After` header. */
                 429: {
                     headers: {
                         [name: string]: unknown;
@@ -220,7 +247,7 @@ export interface paths {
         };
         /**
          * List curated topics
-         * @description 2,184 curated topics with aliases and counts. Public, no API key required.
+         * @description 2,184 curated topics with aliases and counts.
          */
         get: {
             parameters: {
@@ -247,8 +274,8 @@ export interface paths {
                         "application/json": components["schemas"]["TopicsListResponse"];
                     };
                 };
-                /** @description Invalid query parameters. */
-                400: {
+                /** @description Missing, malformed, invalid, or revoked API key. */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -256,7 +283,16 @@ export interface paths {
                         "application/problem+json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Rate limit exceeded. */
+                /** @description IP not allowed (per-key allowlist). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Rate limit exceeded. See `Retry-After` header. */
                 429: {
                     headers: {
                         [name: string]: unknown;
@@ -319,8 +355,17 @@ export interface paths {
                         "application/json": components["schemas"]["TopicDetailResponse"];
                     };
                 };
-                /** @description Invalid query parameters. */
-                400: {
+                /** @description Missing, malformed, invalid, or revoked API key. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description IP not allowed (per-key allowlist). */
+                403: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -337,7 +382,7 @@ export interface paths {
                         "application/problem+json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Rate limit exceeded. */
+                /** @description Rate limit exceeded. See `Retry-After` header. */
                 429: {
                     headers: {
                         [name: string]: unknown;
@@ -400,8 +445,8 @@ export interface paths {
                         "application/json": components["schemas"]["TagsListResponse"];
                     };
                 };
-                /** @description Invalid query parameters. */
-                400: {
+                /** @description Missing, malformed, invalid, or revoked API key. */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -409,7 +454,16 @@ export interface paths {
                         "application/problem+json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Rate limit exceeded. */
+                /** @description IP not allowed (per-key allowlist). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Rate limit exceeded. See `Retry-After` header. */
                 429: {
                     headers: {
                         [name: string]: unknown;
@@ -472,8 +526,8 @@ export interface paths {
                         "application/json": components["schemas"]["SubcategoriesListResponse"];
                     };
                 };
-                /** @description Invalid query parameters. */
-                400: {
+                /** @description Missing, malformed, invalid, or revoked API key. */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -481,7 +535,16 @@ export interface paths {
                         "application/problem+json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Rate limit exceeded. */
+                /** @description IP not allowed (per-key allowlist). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Rate limit exceeded. See `Retry-After` header. */
                 429: {
                     headers: {
                         [name: string]: unknown;
@@ -520,7 +583,7 @@ export interface paths {
         put?: never;
         /**
          * Report a problem with a question
-         * @description Public submission for translation / factual / inappropriate / attribution / other reports. Rate-limited 5/min/IP.
+         * @description Anonymous submission for translation / factual / inappropriate / attribution / other reports. Rate-limited 5/min/IP. No API key required.
          */
         post: {
             parameters: {
@@ -759,7 +822,8 @@ export interface paths {
                     limit?: number;
                     /** @description Display language for category names + slug labels (subcategories/tags) */
                     lang?: "en" | "pl";
-                    updated_since?: string | null;
+                    /** @description ISO 8601 datetime — only questions modified after this point. */
+                    updated_since?: string;
                     category?: string;
                     difficulty?: "easy" | "medium" | "hard";
                     type?: "multiple" | "boolean" | "text_input";
@@ -1067,6 +1131,21 @@ export interface components {
             retryAfter?: number;
             /** @description URL to upgrade plan (429 only). */
             upgradeUrl?: string;
+            /**
+             * @description Rate limit ceiling that was exceeded (429 only).
+             * @example 5
+             */
+            limit?: number;
+            /**
+             * @description API tier whose limit was exceeded (429 only).
+             * @example free
+             */
+            tier?: string;
+            /**
+             * @description Number of requests in current window (429 only).
+             * @example 100
+             */
+            current?: number;
         };
         Question: {
             /**
@@ -1516,19 +1595,15 @@ export interface components {
         ApiKeyInfo: {
             /** @example 01J3KXY1ZAB7CQNR8TP4Z9EXMQ */
             id: string;
-            /** @example Default test key */
+            /** @example Default key */
             name: string;
             /**
              * @description Masked display value.
-             * @example qb_test_pk_••••1234
+             * @example qb_pk_••••1234
              */
             prefix: string;
             /**
-             * @example test
-             * @enum {string}
-             */
-            env: "test" | "live";
-            /**
+             * @description `pk` (publishable, CORS-safe for browsers) or `sk` (secret, backend-only).
              * @example pk
              * @enum {string}
              */
@@ -1536,16 +1611,16 @@ export interface components {
         };
         RateLimitInfo: {
             /**
-             * @description Per-minute window cap. Test keys report `Number.MAX_SAFE_INTEGER`.
-             * @example 60
+             * @description Burst window cap (10s sliding). Shared across all active keys of the user.
+             * @example 10
              */
             limit: number;
-            /** @example 58 */
+            /** @example 8 */
             remaining: number;
-            /** @example 42 */
+            /** @example 7 */
             resetInSeconds: number;
-            /** @example 60 */
-            perMinute: number;
+            /** @example 10 */
+            burstPer10s: number;
             /** @example 500 */
             perDay: number;
         };
