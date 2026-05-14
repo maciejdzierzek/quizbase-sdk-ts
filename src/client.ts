@@ -37,7 +37,7 @@ const DEFAULT_TIMEOUTS: Record<EndpointKey, number> = {
 };
 
 export interface ClientOptions {
-	/** API key. Use `qb_test_pk_*` / `qb_test_sk_*` for development (free, unmetered) and `qb_live_*` in production. */
+	/** API key — `qb_pk_*` (publishable, CORS-safe for browsers) or `qb_sk_*` (secret, backend-only). Get one at https://quizbase.runriva.com/dashboard/keys. */
 	apiKey: string;
 	/** Override base URL. Defaults to `https://quizbase.runriva.com`. */
 	baseUrl?: string;

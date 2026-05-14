@@ -24,14 +24,16 @@ Requires Node ≥20 (or any modern browser with `fetch` + `AbortController`).
 import { createClient } from '@quizbase/client';
 
 const client = createClient({
-  apiKey: process.env.QUIZBASE_API_KEY!  // qb_test_pk_… or qb_live_pk_…
+  apiKey: process.env.QUIZBASE_API_KEY!  // qb_pk_… (publishable) or qb_sk_… (secret)
 });
 
-const random = await client.questions.random({ category: 'science', lang: 'en' });
+const random = await client.questions.random({ category: 'science-and-nature', lang: 'en' });
 console.log(random.data.question);
 ```
 
-Get a key at [quizbase.runriva.com](https://quizbase.runriva.com). `qb_test_*` keys are free and unmetered for development.
+Get a key at [quizbase.runriva.com/dashboard/keys](https://quizbase.runriva.com/dashboard/keys). The free tier is **500 requests/day across all your keys** against full production data — enough to ship a real app. Paid tiers at [/pricing](https://quizbase.runriva.com/pricing).
+
+Use `qb_pk_*` (publishable) from browsers and edge functions — CORS is enabled. Use `qb_sk_*` (secret) only from servers and CI; CORS is blocked for these. Both formats authenticate identically and share the same per-user quota.
 
 ## Resources
 
