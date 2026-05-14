@@ -27,13 +27,13 @@ describe('createClient', () => {
 	it('sends Bearer auth + X-Request-Id + User-Agent', async () => {
 		const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
 			const headers = new Headers(init?.headers);
-			expect(headers.get('authorization')).toBe('Bearer qb_test_pk_xyz');
+			expect(headers.get('authorization')).toBe('Bearer qb_pk_xyz');
 			expect(headers.get('x-request-id')).toMatch(/.+/);
 			expect(headers.get('user-agent')).toMatch(/^quizbase-client\/0\.1\.0/);
 			expect(String(input)).toContain('/api/v1/categories');
 			return jsonResponse(200, { data: [], meta: {} });
 		});
-		const client = createClient({ apiKey: 'qb_test_pk_xyz', fetch: fetchMock as typeof fetch });
+		const client = createClient({ apiKey: 'qb_pk_xyz', fetch: fetchMock as typeof fetch });
 		await client.categories.list({ lang: 'en' });
 		expect(fetchMock).toHaveBeenCalledOnce();
 	});
@@ -44,7 +44,7 @@ describe('createClient', () => {
 			expect(url.searchParams.getAll('tags_any')).toEqual(['einstein', 'newton']);
 			return jsonResponse(200, { data: [], meta: {} });
 		});
-		const client = createClient({ apiKey: 'qb_test_pk_x', fetch: fetchMock as typeof fetch });
+		const client = createClient({ apiKey: 'qb_pk_x', fetch: fetchMock as typeof fetch });
 		await client.questions.random({ tags_any: ['einstein', 'newton'] } as never);
 	});
 
@@ -59,7 +59,7 @@ describe('createClient', () => {
 			})
 		);
 		const client = createClient({
-			apiKey: 'qb_test_pk_x',
+			apiKey: 'qb_pk_x',
 			retries: 0,
 			fetch: fetchMock as typeof fetch
 		});
@@ -79,7 +79,7 @@ describe('createClient', () => {
 			})
 		);
 		const client = createClient({
-			apiKey: 'qb_test_pk_x',
+			apiKey: 'qb_pk_x',
 			retries: 0,
 			fetch: fetchMock as typeof fetch
 		});
@@ -110,7 +110,7 @@ describe('createClient', () => {
 			return jsonResponse(200, { data: [], meta: {} });
 		});
 		const client = createClient({
-			apiKey: 'qb_test_pk_x',
+			apiKey: 'qb_pk_x',
 			retries: 2,
 			fetch: fetchMock as typeof fetch
 		});
@@ -128,7 +128,7 @@ describe('createClient', () => {
 			});
 		});
 		const client = createClient({
-			apiKey: 'qb_test_pk_x',
+			apiKey: 'qb_pk_x',
 			retries: 5,
 			fetch: fetchMock as typeof fetch
 		});
@@ -149,7 +149,7 @@ describe('createClient', () => {
 		});
 		const events: unknown[] = [];
 		const client = createClient({
-			apiKey: 'qb_test_pk_x',
+			apiKey: 'qb_pk_x',
 			retries: 1,
 			fetch: fetchMock as typeof fetch,
 			onRequest: (e) => {
@@ -179,7 +179,7 @@ describe('createClient', () => {
 			return jsonResponse(200, { data: [], meta: {} });
 		});
 		const client = createClient({
-			apiKey: 'qb_test_pk_x',
+			apiKey: 'qb_pk_x',
 			timeout: 30_000,
 			timeouts: { 'questions.random': 5_000 },
 			fetch: fetchMock as typeof fetch
@@ -195,7 +195,7 @@ describe('createClient', () => {
 			throw new TypeError('connection refused');
 		});
 		const client = createClient({
-			apiKey: 'qb_test_pk_x',
+			apiKey: 'qb_pk_x',
 			retries: 1,
 			fetch: fetchMock as typeof fetch
 		});
@@ -206,7 +206,7 @@ describe('createClient', () => {
 	it('telemetry hook errors do not break caller', async () => {
 		const fetchMock = vi.fn(async () => jsonResponse(200, { data: [], meta: {} }));
 		const client = createClient({
-			apiKey: 'qb_test_pk_x',
+			apiKey: 'qb_pk_x',
 			fetch: fetchMock as typeof fetch,
 			onRequest: () => {
 				throw new Error('telemetry boom');
@@ -220,7 +220,7 @@ describe('createClient', () => {
 			expect(String(input)).toContain('/api/v1/topics/world-war-ii');
 			return jsonResponse(200, { data: { slug: 'world-war-ii' }, meta: {} });
 		});
-		const client = createClient({ apiKey: 'qb_test_pk_x', fetch: fetchMock as typeof fetch });
+		const client = createClient({ apiKey: 'qb_pk_x', fetch: fetchMock as typeof fetch });
 		await client.topics.get('world-war-ii');
 	});
 
@@ -231,7 +231,7 @@ describe('createClient', () => {
 			expect(init?.body).toBe(JSON.stringify({ questionId: 'q1', kind: 'incorrect_answer' }));
 			return jsonResponse(202, { data: { reportId: 'r1' }, meta: {} });
 		});
-		const client = createClient({ apiKey: 'qb_test_pk_x', fetch: fetchMock as typeof fetch });
+		const client = createClient({ apiKey: 'qb_pk_x', fetch: fetchMock as typeof fetch });
 		await client.report.create({ questionId: 'q1', kind: 'incorrect_answer' } as never);
 	});
 });
