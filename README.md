@@ -1,6 +1,6 @@
 # @quizbase/client
 
-TypeScript SDK for the [QuizBase API](https://quizbase.runriva.com) — multilingual trivia API with 1.4M+ quiz-ready questions blended from 11 open-licensed sources, English and Polish at launch.
+TypeScript SDK for the [QuizBase API](https://quizbase.runriva.com) — a multilingual trivia API. 1.4M+ blended, deduped questions from 11 open datasets (CC, MIT), English and Polish at launch. Per-record license, author, and source on every response.
 
 [![npm](https://img.shields.io/npm/v/@quizbase/client.svg)](https://www.npmjs.com/package/@quizbase/client)
 [![types](https://img.shields.io/npm/types/@quizbase/client.svg)](https://www.npmjs.com/package/@quizbase/client)
