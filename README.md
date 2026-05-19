@@ -58,6 +58,8 @@ client.report.create({ questionId, kind, comment });
 
 Full parameter docs: [docs.quizbase.runriva.com/docs](https://quizbase.runriva.com/docs) and the interactive [API Reference](https://quizbase.runriva.com/docs/api-reference).
 
+> **Tip:** every question has a stable UUID `id` that never changes. Save it client-side and compose it into multi-language quizzes, daily challenges, anti-cheat, and more — see [Client patterns](#client-patterns-with-stable-ids) below.
+
 ## Pagination
 
 `questions`, `topics`, `tags`, and `subcategories` are cursor-paginated. Use `listAll()` to iterate every item, or `pages()` to iterate page-by-page — both auto-follow `_links.next` and preserve filters across pages.
@@ -75,6 +77,58 @@ for await (const page of client.topics.pages({ lang: 'en' })) {
 ```
 
 Need manual control? `list()` still exposes `_links.next` and a `cursor` query param.
+
+## Client patterns with stable IDs
+
+Every question carries a stable UUID v7 `id` that never changes after import. The SDK is intentionally **thin** — no `?seed=`, no `?daily=`, no built-in deduplication. The stable id is the primitive you compose into mechanics. Six patterns cover most real apps:
+
+### Same question across languages
+
+```ts
+const en = await client.questions.random({ lang: 'en' });
+const id = en.data[0].id;
+const pl = await client.questions.get(id, { lang: 'pl' });
+const es = await client.questions.get(id, { lang: 'es' });
+// Same canonical question, three languages — UUID is the link.
+```
+
+### Don't repeat — exclude seen questions
+
+```ts
+const seen = new Set<string>();
+const batch = await client.questions.random({
+  category: 'science-and-nature',
+  amount: 20,
+  exclude: [...seen]
+});
+batch.data.forEach((q) => seen.add(q.id));
+```
+
+`exclude` accepts up to 250 UUIDs. For longer histories keep `seen` client-side and filter after the fetch.
+
+### Daily challenge — same question for everyone today
+
+```ts
+const day = new Date().toISOString().slice(0, 10); // "2026-05-19"
+const idx = [...day].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7);
+const pool = await client.questions.list({ category: 'history', limit: 50 });
+const todays = pool.data[Math.abs(idx) % pool.data.length];
+// Persist `todays.id` server-side so retries serve the same question.
+```
+
+### Multiplayer sync — both players see the same question
+
+Your matchmaker picks one `id` (via `random` or `list`), broadcasts to both clients, and both clients call `questions.get(id, { lang })`. Same UUID, per-player language preference. Zero state on QuizBase — your matchmaker owns the round.
+
+### Server-side anti-cheat — never ship `correctAnswer` to the client
+
+Use `qb_sk_*` (secret key) from your server to fetch full questions including `correctAnswer`. Forward only `id` + `text` + a shuffled `[correctAnswer, ...incorrectAnswers]` to the client. Validate the submitted answer server-side by re-fetching with the same `id`. Browsers cannot reach `qb_sk_*` — CORS blocks it.
+
+### Stable Anki / Quizlet flashcards across updates
+
+Save `{id, lang}` as your card key. When the upstream question changes (typo fix, distractor swap, translation refresh), `questions.get(id, { lang })` returns the updated content under the same id — your card auto-updates without re-import. Soft-deleted questions return 404; treat that as "card removed upstream".
+
+Full code samples and edge cases at [/docs/api/questions-by-id § What you can do with a stable id](https://quizbase.runriva.com/docs/api/questions-by-id). For MCP agents, the same playbook is exposed as the `client_mechanics_patterns` prompt.
 
 ## Errors
 
