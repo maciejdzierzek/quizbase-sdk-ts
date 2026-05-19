@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.3.0...v0.4.0) (2026-05-19)
+
+
+### Features
+
+* add async iterator pagination (listAll / pages) ([40921aa](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/40921aa1d84e4c2374e4c23a292e11396d38ae85))
+
 ## [0.3.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.2.3...v0.3.0) (2026-05-14)
 
 
