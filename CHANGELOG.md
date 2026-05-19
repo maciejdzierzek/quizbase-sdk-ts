@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.4.0...v0.4.1) (2026-05-19)
+
+
+### Bug Fixes
+
+* correct random response shape in quick start example ([27059c4](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/27059c4a13313ef146e6f4dd1998afc8df909c1e))
+
 ## [0.4.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.3.0...v0.4.0) (2026-05-19)
 
 
