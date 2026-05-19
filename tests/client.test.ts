@@ -236,6 +236,108 @@ describe('createClient', () => {
 	});
 });
 
+describe('pagination', () => {
+	function paginatedResponse(items: unknown[], nextCursor: string | null): Response {
+		const body: Record<string, unknown> = {
+			data: items,
+			meta: { count: items.length, language: 'en', requestId: '00000000-0000-0000-0000-000000000000' }
+		};
+		if (nextCursor) {
+			body._links = {
+				next: `/api/v1/questions?cursor=${encodeURIComponent(nextCursor)}&limit=2`
+			};
+		} else {
+			body._links = {};
+		}
+		return jsonResponse(200, body);
+	}
+
+	it('questions.pages walks _links.next until exhausted', async () => {
+		const calls: string[] = [];
+		const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+			const url = new URL(String(input));
+			const cursor = url.searchParams.get('cursor');
+			calls.push(cursor ?? '<none>');
+			if (cursor === null) return paginatedResponse([{ id: 'q1' }, { id: 'q2' }], 'cur-1');
+			if (cursor === 'cur-1') return paginatedResponse([{ id: 'q3' }, { id: 'q4' }], 'cur-2');
+			return paginatedResponse([{ id: 'q5' }], null);
+		});
+		const client = createClient({ apiKey: 'qb_pk_x', fetch: fetchMock as typeof fetch });
+		const pages: unknown[] = [];
+		for await (const page of client.questions.pages({ lang: 'en', limit: 2 })) {
+			pages.push(page);
+		}
+		expect(pages).toHaveLength(3);
+		expect(calls).toEqual(['<none>', 'cur-1', 'cur-2']);
+	});
+
+	it('questions.listAll flattens items across pages', async () => {
+		const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+			const url = new URL(String(input));
+			const cursor = url.searchParams.get('cursor');
+			if (cursor === null) return paginatedResponse([{ id: 'q1' }, { id: 'q2' }], 'cur-1');
+			if (cursor === 'cur-1') return paginatedResponse([{ id: 'q3' }], null);
+			throw new Error('unexpected cursor');
+		});
+		const client = createClient({ apiKey: 'qb_pk_x', fetch: fetchMock as typeof fetch });
+		const ids: string[] = [];
+		for await (const q of client.questions.listAll({ lang: 'en' })) {
+			ids.push((q as { id: string }).id);
+		}
+		expect(ids).toEqual(['q1', 'q2', 'q3']);
+	});
+
+	it('pagination preserves user-supplied filters across pages', async () => {
+		const langs: (string | null)[] = [];
+		const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+			const url = new URL(String(input));
+			langs.push(url.searchParams.get('lang'));
+			const cursor = url.searchParams.get('cursor');
+			if (cursor === null) return paginatedResponse([{ id: 'q1' }], 'cur-1');
+			return paginatedResponse([{ id: 'q2' }], null);
+		});
+		const client = createClient({ apiKey: 'qb_pk_x', fetch: fetchMock as typeof fetch });
+		for await (const _ of client.questions.listAll({ lang: 'pl', limit: 1 })) void _;
+		expect(langs).toEqual(['pl', 'pl']);
+	});
+
+	it('stops when _links.next is missing on the first page', async () => {
+		const fetchMock = vi.fn(async () => paginatedResponse([{ slug: 'einstein' }], null));
+		const client = createClient({ apiKey: 'qb_pk_x', fetch: fetchMock as typeof fetch });
+		let count = 0;
+		for await (const _ of client.tags.listAll({ lang: 'en' })) {
+			count += 1;
+			void _;
+		}
+		expect(count).toBe(1);
+		expect(fetchMock).toHaveBeenCalledOnce();
+	});
+
+	it('topics.pages and subcategories.listAll wire through the same paginator', async () => {
+		const topicsMock = vi.fn(async () =>
+			jsonResponse(200, { data: [{ slug: 't1' }], meta: {}, _links: {} })
+		);
+		const subsMock = vi.fn(async () =>
+			jsonResponse(200, {
+				data: [{ slug: 's1' }, { slug: 's2' }],
+				meta: {},
+				_links: {}
+			})
+		);
+		const topicsClient = createClient({ apiKey: 'qb_pk_x', fetch: topicsMock as typeof fetch });
+		const pages = [];
+		for await (const p of topicsClient.topics.pages({ lang: 'en' })) pages.push(p);
+		expect(pages).toHaveLength(1);
+
+		const subsClient = createClient({ apiKey: 'qb_pk_x', fetch: subsMock as typeof fetch });
+		const slugs: string[] = [];
+		for await (const s of subsClient.subcategories.listAll({ lang: 'en' })) {
+			slugs.push((s as { slug: string }).slug);
+		}
+		expect(slugs).toEqual(['s1', 's2']);
+	});
+});
+
 describe('integration (prod)', () => {
 	const key = process.env.QUIZBASE_TEST_KEY;
 	const skip = !key;

@@ -55,11 +55,14 @@ export interface ClientOptions {
 	userAgent?: string;
 }
 
+type QuestionsListParams = paths['/api/v1/questions']['get']['parameters']['query'];
+type TopicsListParams = paths['/api/v1/topics']['get']['parameters']['query'];
+type TagsListParams = paths['/api/v1/tags']['get']['parameters']['query'];
+type SubcategoriesListParams = paths['/api/v1/subcategories']['get']['parameters']['query'];
+
 export interface QuizbaseClient {
 	questions: {
-		list(
-			params?: paths['/api/v1/questions']['get']['parameters']['query']
-		): Promise<Schemas['QuestionsListResponse']>;
+		list(params?: QuestionsListParams): Promise<Schemas['QuestionsListResponse']>;
 		random(
 			params?: paths['/api/v1/questions/random']['get']['parameters']['query']
 		): Promise<Schemas['QuestionsRandomResponse']>;
@@ -67,6 +70,10 @@ export interface QuizbaseClient {
 			id: string,
 			params?: paths['/api/v1/questions/{id}']['get']['parameters']['query']
 		): Promise<Schemas['QuestionByIdResponse']>;
+		/** Iterate every page of `/questions`, auto-following `_links.next`. */
+		pages(params?: QuestionsListParams): AsyncIterableIterator<Schemas['QuestionsListResponse']>;
+		/** Iterate every question across all pages. */
+		listAll(params?: QuestionsListParams): AsyncIterableIterator<Schemas['Question']>;
 	};
 	categories: {
 		list(
@@ -77,23 +84,31 @@ export interface QuizbaseClient {
 		list(): Promise<Schemas['LanguagesResponse']>;
 	};
 	topics: {
-		list(
-			params?: paths['/api/v1/topics']['get']['parameters']['query']
-		): Promise<Schemas['TopicsListResponse']>;
+		list(params?: TopicsListParams): Promise<Schemas['TopicsListResponse']>;
 		get(
 			slug: string,
 			params?: paths['/api/v1/topics/{slug}']['get']['parameters']['query']
 		): Promise<Schemas['TopicDetailResponse']>;
+		/** Iterate every page of `/topics`, auto-following `_links.next`. */
+		pages(params?: TopicsListParams): AsyncIterableIterator<Schemas['TopicsListResponse']>;
+		/** Iterate every topic across all pages. */
+		listAll(params?: TopicsListParams): AsyncIterableIterator<Schemas['TopicEntry']>;
 	};
 	tags: {
-		list(
-			params?: paths['/api/v1/tags']['get']['parameters']['query']
-		): Promise<Schemas['TagsListResponse']>;
+		list(params?: TagsListParams): Promise<Schemas['TagsListResponse']>;
+		/** Iterate every page of `/tags`, auto-following `_links.next`. */
+		pages(params?: TagsListParams): AsyncIterableIterator<Schemas['TagsListResponse']>;
+		/** Iterate every tag across all pages. */
+		listAll(params?: TagsListParams): AsyncIterableIterator<Schemas['RawSlugEntry']>;
 	};
 	subcategories: {
-		list(
-			params?: paths['/api/v1/subcategories']['get']['parameters']['query']
-		): Promise<Schemas['SubcategoriesListResponse']>;
+		list(params?: SubcategoriesListParams): Promise<Schemas['SubcategoriesListResponse']>;
+		/** Iterate every page of `/subcategories`, auto-following `_links.next`. */
+		pages(
+			params?: SubcategoriesListParams
+		): AsyncIterableIterator<Schemas['SubcategoriesListResponse']>;
+		/** Iterate every subcategory across all pages. */
+		listAll(params?: SubcategoriesListParams): AsyncIterableIterator<Schemas['RawSlugEntry']>;
 	};
 	stats: {
 		get(): Promise<Schemas['StatsResponse']>;
@@ -281,29 +296,34 @@ export function createClient(options: ClientOptions): QuizbaseClient {
 	}
 
 	return {
-		questions: {
-			list: (params) =>
-				request({
+		questions: (() => {
+			const list = (params?: QuestionsListParams) =>
+				request<Schemas['QuestionsListResponse']>({
 					endpoint: 'questions.list',
 					method: 'GET',
 					path: '/api/v1/questions',
 					query: params
-				}),
-			random: (params) =>
-				request({
-					endpoint: 'questions.random',
-					method: 'GET',
-					path: '/api/v1/questions/random',
-					query: params
-				}),
-			get: (id, params) =>
-				request({
-					endpoint: 'questions.get',
-					method: 'GET',
-					path: `/api/v1/questions/${encodeURIComponent(id)}`,
-					query: params
-				})
-		},
+				});
+			return {
+				list,
+				random: (params) =>
+					request({
+						endpoint: 'questions.random',
+						method: 'GET',
+						path: '/api/v1/questions/random',
+						query: params
+					}),
+				get: (id, params) =>
+					request({
+						endpoint: 'questions.get',
+						method: 'GET',
+						path: `/api/v1/questions/${encodeURIComponent(id)}`,
+						query: params
+					}),
+				pages: (params) => paginate(list, params),
+				listAll: (params) => paginateItems(list, params)
+			} satisfies QuizbaseClient['questions'];
+		})(),
 		categories: {
 			list: (params) =>
 				request({
@@ -321,40 +341,55 @@ export function createClient(options: ClientOptions): QuizbaseClient {
 					path: '/api/v1/languages'
 				})
 		},
-		topics: {
-			list: (params) =>
-				request({
+		topics: (() => {
+			const list = (params?: TopicsListParams) =>
+				request<Schemas['TopicsListResponse']>({
 					endpoint: 'topics.list',
 					method: 'GET',
 					path: '/api/v1/topics',
 					query: params
-				}),
-			get: (slug, params) =>
-				request({
-					endpoint: 'topics.get',
-					method: 'GET',
-					path: `/api/v1/topics/${encodeURIComponent(slug)}`,
-					query: params
-				})
-		},
-		tags: {
-			list: (params) =>
-				request({
+				});
+			return {
+				list,
+				get: (slug, params) =>
+					request({
+						endpoint: 'topics.get',
+						method: 'GET',
+						path: `/api/v1/topics/${encodeURIComponent(slug)}`,
+						query: params
+					}),
+				pages: (params) => paginate(list, params),
+				listAll: (params) => paginateItems(list, params)
+			} satisfies QuizbaseClient['topics'];
+		})(),
+		tags: (() => {
+			const list = (params?: TagsListParams) =>
+				request<Schemas['TagsListResponse']>({
 					endpoint: 'tags.list',
 					method: 'GET',
 					path: '/api/v1/tags',
 					query: params
-				})
-		},
-		subcategories: {
-			list: (params) =>
-				request({
+				});
+			return {
+				list,
+				pages: (params) => paginate(list, params),
+				listAll: (params) => paginateItems(list, params)
+			} satisfies QuizbaseClient['tags'];
+		})(),
+		subcategories: (() => {
+			const list = (params?: SubcategoriesListParams) =>
+				request<Schemas['SubcategoriesListResponse']>({
 					endpoint: 'subcategories.list',
 					method: 'GET',
 					path: '/api/v1/subcategories',
 					query: params
-				})
-		},
+				});
+			return {
+				list,
+				pages: (params) => paginate(list, params),
+				listAll: (params) => paginateItems(list, params)
+			} satisfies QuizbaseClient['subcategories'];
+		})(),
 		stats: {
 			get: () =>
 				request({
@@ -390,6 +425,55 @@ export function createClient(options: ClientOptions): QuizbaseClient {
 				})
 		}
 	};
+}
+
+interface PaginatedParams {
+	cursor?: string;
+	[key: string]: unknown;
+}
+
+interface PaginatedPage<T> {
+	data: T[];
+	_links?: { next?: string; prev?: string };
+}
+
+/**
+ * Extract the `cursor` query param from an absolute or relative `_links.next` URL.
+ * Returns `null` when the URL is absent or malformed — caller treats that as end-of-stream.
+ */
+function extractCursor(nextUrl: string | undefined): string | null {
+	if (!nextUrl) return null;
+	try {
+		const url = nextUrl.startsWith('http')
+			? new URL(nextUrl)
+			: new URL(nextUrl, 'http://placeholder');
+		return url.searchParams.get('cursor');
+	} catch {
+		return null;
+	}
+}
+
+async function* paginate<P extends PaginatedParams, R extends PaginatedPage<unknown>>(
+	fetchPage: (params?: P) => Promise<R>,
+	initial: P | undefined
+): AsyncIterableIterator<R> {
+	let nextParams: P | undefined = initial;
+	while (true) {
+		const page = await fetchPage(nextParams);
+		yield page;
+		const cursor = extractCursor(page._links?.next);
+		if (!cursor) return;
+		nextParams = { ...(nextParams ?? ({} as P)), cursor } as P;
+	}
+}
+
+async function* paginateItems<P extends PaginatedParams, T>(
+	fetchPage: (params?: P) => Promise<PaginatedPage<T>>,
+	initial: P | undefined
+): AsyncIterableIterator<T> {
+	for await (const page of paginate(fetchPage, initial)) {
+		for (const item of page.data) yield item;
+	}
 }
 
 function buildUrl(baseUrl: string, path: string, query: Record<string, unknown> | undefined): string {

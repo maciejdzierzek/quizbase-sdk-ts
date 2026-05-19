@@ -58,6 +58,24 @@ client.report.create({ questionId, kind, comment });
 
 Full parameter docs: [docs.quizbase.runriva.com/docs](https://quizbase.runriva.com/docs) and the interactive [API Reference](https://quizbase.runriva.com/docs/api-reference).
 
+## Pagination
+
+`questions`, `topics`, `tags`, and `subcategories` are cursor-paginated. Use `listAll()` to iterate every item, or `pages()` to iterate page-by-page — both auto-follow `_links.next` and preserve filters across pages.
+
+```ts
+// Iterate every matching question. Filters and limit are reused on each page.
+for await (const q of client.questions.listAll({ lang: 'pl', tags_any: ['einstein'] })) {
+  await db.upsert(q);
+}
+
+// Iterate pages — useful when you need batch boundaries (checkpoints, logging).
+for await (const page of client.topics.pages({ lang: 'en' })) {
+  console.log(page.meta.requestId, page.data.length);
+}
+```
+
+Need manual control? `list()` still exposes `_links.next` and a `cursor` query param.
+
 ## Errors
 
 Every non-2xx response throws `QuizbaseError` carrying the parsed [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9457):
