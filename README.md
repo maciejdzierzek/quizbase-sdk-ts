@@ -28,7 +28,7 @@ const client = createClient({
 });
 
 const random = await client.questions.random({ category: 'science-and-nature', lang: 'en' });
-console.log(random.data.question);
+console.log(random.data[0].text);
 ```
 
 Get a key at [quizbase.runriva.com/dashboard/keys](https://quizbase.runriva.com/dashboard/keys). The free tier is **500 requests/day across all your keys** against full production data — enough to ship a real app. Paid tiers at [/pricing](https://quizbase.runriva.com/pricing).
