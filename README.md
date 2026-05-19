@@ -218,7 +218,7 @@ All responses are typed from the OpenAPI spec. Hover over `client.questions.rand
 - **GitHub:** [maciejdzierzek/quizbase-sdk-ts](https://github.com/maciejdzierzek/quizbase-sdk-ts)
 - **Issues / feedback:** [GitHub Issues](https://github.com/maciejdzierzek/quizbase-sdk-ts/issues)
 - **Releases:** automated by [release-please](https://github.com/googleapis/release-please) from conventional commits
-- **Drift guard:** the main repo [`tests/api/sdk-contract.spec.ts`](https://github.com/maciejdzierzek/quizbase) verifies the latest published SDK still matches `/openapi.json`
+- **Drift guard:** every release is verified against the live OpenAPI spec at [quizbase.runriva.com/openapi.json](https://quizbase.runriva.com/openapi.json) — types reflect the current API surface.
 
 ## License
 
