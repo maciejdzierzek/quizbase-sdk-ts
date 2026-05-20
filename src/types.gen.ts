@@ -832,9 +832,10 @@ export interface paths {
                     topic?: string;
                     topics_any?: string;
                     subcategory?: string;
-                    quality?: "high";
+                    /** @description Quality preset: "high" (default) skips needs_review=true; "all" includes everything */
+                    quality?: "high" | "all";
                     regions?: string;
-                    source?: "opentdb" | "opentriviaqa" | "mkqa" | "mmlu-prox" | "wikipedia" | "community" | "runriva" | "ai-generated" | "purchased" | "quizbase";
+                    source?: "arc" | "creak" | "entityq" | "kqa-pro" | "mintaka" | "mkqa" | "nq-open" | "opentdb" | "opentriviaqa" | "qasc" | "quizbase" | "webq";
                     license?: "CC-BY-SA-4.0" | "CC-BY-SA-3.0" | "CC-BY-4.0" | "MIT" | "proprietary";
                     count?: "estimate" | "exact" | "none";
                 };
@@ -933,9 +934,10 @@ export interface paths {
                     topic?: string;
                     topics_any?: string;
                     subcategory?: string;
-                    quality?: "high";
+                    /** @description Quality preset: "high" (default) skips needs_review=true; "all" includes everything */
+                    quality?: "high" | "all";
                     regions?: string;
-                    source?: "opentdb" | "opentriviaqa" | "mkqa" | "mmlu-prox" | "wikipedia" | "community" | "runriva" | "ai-generated" | "purchased" | "quizbase";
+                    source?: "arc" | "creak" | "entityq" | "kqa-pro" | "mintaka" | "mkqa" | "nq-open" | "opentdb" | "opentriviaqa" | "qasc" | "quizbase" | "webq";
                     license?: "CC-BY-SA-4.0" | "CC-BY-SA-3.0" | "CC-BY-4.0" | "MIT" | "proprietary";
                     exclude?: string;
                 };
@@ -1189,6 +1191,12 @@ export interface components {
              */
             regions: string[];
             attribution: components["schemas"]["Attribution"];
+            /**
+             * @description Quality flag. Present only when the client requested non-default content via `?quality=all` (REST) or `quality: "all"` (MCP) — and always on `/api/v1/questions/{id}` deep-link responses. For default `?quality=high` all returned questions are by definition `high`, so the field is omitted to avoid redundancy. `needs_review` = flagged for moderation review (low-quality distractors, trivial answer-in-question patterns).
+             * @example high
+             * @enum {string}
+             */
+            quality?: "high" | "needs_review";
             /**
              * Format: uuid
              * @description Direct parent (usually English source) when this is a translation.
