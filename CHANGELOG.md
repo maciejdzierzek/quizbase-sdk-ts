@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.5.0...v0.6.0) (2026-05-20)
+
+
+### Features
+
+* add client.regions namespace + cultural-affinity README section ([837c0b3](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/837c0b3334a2675830228d2c94bb2ab21589fbaa))
+
 ## [0.5.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.4.1...v0.5.0) (2026-05-20)
 
 
