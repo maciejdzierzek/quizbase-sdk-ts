@@ -572,6 +572,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/regions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List region codes (cultural affinity)
+         * @description Discovery dla `regions` filter. **Cultural affinity** — pytanie ma code regionu, jeśli mieszkańcy kraju lub członkowie grupy kulturowej/religijnej są statystycznie częściej w stanie odpowiedzieć (NIE geografia tematu pytania). Lowercase ISO 3166-1 alpha-2 (`us`, `pl`, `gb`) + cultural codes (`jewish`, `christian-catholic`, `islam` — LLM schema whitelist parity). Sourced z `mv_region_counts` (pre-aggregated TABLE). Cardinality ~150 distinct codes per language.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    /** @description Display language for category names + slug labels (subcategories/tags) */
+                    lang?: "en" | "pl";
+                    q?: string;
+                    kind?: "country" | "cultural";
+                    cursor?: string;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Region codes with labels, kind classification, counts. */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["RegionsListResponse"];
+                    };
+                };
+                /** @description Missing, malformed, invalid, or revoked API key. */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description IP not allowed (per-key allowlist). */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Rate limit exceeded. See `Retry-After` header. */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Server error. */
+                500: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/report": {
         parameters: {
             query?: never;
@@ -834,6 +916,7 @@ export interface paths {
                     subcategory?: string;
                     /** @description Quality preset: "high" (default) skips needs_review=true; "all" includes everything */
                     quality?: "high" | "all";
+                    /** @description Cultural affinity codes. A question is tagged with a region if residents of that country, or members of that cultural/religious group, are statistically more likely to know the answer (NOT geography of the subject). Lowercase ISO 3166-1 alpha-2 (e.g. `us`, `pl`, `gb`) plus cultural codes (`jewish`, `christian-catholic`, `islam`). AND-logic. Empty array on a question = universally accessible (no cultural advantage). Discover via `GET /api/v1/regions`. Uppercase tolerated on input (normalized to lowercase). */
                     regions?: string;
                     source?: "arc" | "creak" | "entityq" | "kqa-pro" | "mintaka" | "mkqa" | "nq-open" | "opentdb" | "opentriviaqa" | "qasc" | "quizbase" | "webq";
                     license?: "CC-BY-SA-4.0" | "CC-BY-SA-3.0" | "CC-BY-4.0" | "MIT" | "proprietary";
@@ -936,6 +1019,7 @@ export interface paths {
                     subcategory?: string;
                     /** @description Quality preset: "high" (default) skips needs_review=true; "all" includes everything */
                     quality?: "high" | "all";
+                    /** @description Cultural affinity codes. A question is tagged with a region if residents of that country, or members of that cultural/religious group, are statistically more likely to know the answer (NOT geography of the subject). Lowercase ISO 3166-1 alpha-2 (e.g. `us`, `pl`, `gb`) plus cultural codes (`jewish`, `christian-catholic`, `islam`). AND-logic. Empty array on a question = universally accessible (no cultural advantage). Discover via `GET /api/v1/regions`. Uppercase tolerated on input (normalized to lowercase). */
                     regions?: string;
                     source?: "arc" | "creak" | "entityq" | "kqa-pro" | "mintaka" | "mkqa" | "nq-open" | "opentdb" | "opentriviaqa" | "qasc" | "quizbase" | "webq";
                     license?: "CC-BY-SA-4.0" | "CC-BY-SA-3.0" | "CC-BY-4.0" | "MIT" | "proprietary";
@@ -1185,6 +1269,7 @@ export interface components {
             /** @description Localized `{slug, label}` per `?lang=`. */
             tags: components["schemas"]["SlugLabel"][];
             /**
+             * @description Cultural affinity codes — residents/members of these countries or cultural groups are statistically more likely to know the answer. Lowercase ISO 3166-1 alpha-2 (`us`, `pl`, `gb`) + cultural codes (`jewish`, `christian-catholic`, `islam`). Empty array = universally accessible. Discover the full catalog via `GET /api/v1/regions`.
              * @example [
              *       "pl"
              *     ]
@@ -1544,6 +1629,41 @@ export interface components {
             data: components["schemas"]["RawSlugEntry"][];
             meta: components["schemas"]["MetaTagsList"];
             _links?: components["schemas"]["Links"];
+        };
+        RegionsListResponse: {
+            data: components["schemas"]["RegionEntry"][];
+            meta: components["schemas"]["MetaRegionsList"];
+            _links?: components["schemas"]["Links"];
+        };
+        RegionEntry: {
+            /** @example pl */
+            code: string;
+            /**
+             * @example country
+             * @enum {string}
+             */
+            kind: "country" | "cultural";
+            /** @example Poland */
+            label: string;
+            /** @example 7388 */
+            count: number;
+        };
+        MetaRegionsList: {
+            /** @example 100 */
+            count: number;
+            /** @example 152 */
+            total: number;
+            /**
+             * @description Language of the response content.
+             * @example en
+             */
+            language: string;
+            /**
+             * Format: uuid
+             * @description Unique request identifier (also in `X-Request-Id` response header).
+             * @example 127fc6d1-d6fb-4771-b2a7-211a08749e5b
+             */
+            requestId: string;
         };
         ReportAcceptedResponse: {
             /** @enum {boolean} */

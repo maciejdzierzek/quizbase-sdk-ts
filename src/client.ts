@@ -15,6 +15,7 @@ export type EndpointKey =
 	| 'topics.get'
 	| 'tags.list'
 	| 'subcategories.list'
+	| 'regions.list'
 	| 'stats.get'
 	| 'me.get'
 	| 'usage.get'
@@ -30,6 +31,7 @@ const DEFAULT_TIMEOUTS: Record<EndpointKey, number> = {
 	'topics.get': 10_000,
 	'tags.list': 15_000,
 	'subcategories.list': 15_000,
+	'regions.list': 10_000,
 	'stats.get': 10_000,
 	'me.get': 10_000,
 	'usage.get': 10_000,
@@ -59,6 +61,7 @@ type QuestionsListParams = paths['/api/v1/questions']['get']['parameters']['quer
 type TopicsListParams = paths['/api/v1/topics']['get']['parameters']['query'];
 type TagsListParams = paths['/api/v1/tags']['get']['parameters']['query'];
 type SubcategoriesListParams = paths['/api/v1/subcategories']['get']['parameters']['query'];
+type RegionsListParams = paths['/api/v1/regions']['get']['parameters']['query'];
 
 export interface QuizbaseClient {
 	questions: {
@@ -109,6 +112,21 @@ export interface QuizbaseClient {
 		): AsyncIterableIterator<Schemas['SubcategoriesListResponse']>;
 		/** Iterate every subcategory across all pages. */
 		listAll(params?: SubcategoriesListParams): AsyncIterableIterator<Schemas['RawSlugEntry']>;
+	};
+	/**
+	 * Region codes — **cultural affinity**, not geography. A question is tagged with
+	 * a region if residents of that country or members of that cultural/religious
+	 * group are statistically more likely to know the answer. Lowercase ISO 3166-1
+	 * alpha-2 (`us`, `pl`, `gb`) plus cultural codes (`jewish`, `christian-catholic`,
+	 * `islam`). Pair with `questions.random({ regions: [...] })` to fetch matching
+	 * questions.
+	 */
+	regions: {
+		list(params?: RegionsListParams): Promise<Schemas['RegionsListResponse']>;
+		/** Iterate every page of `/regions`, auto-following `_links.next`. */
+		pages(params?: RegionsListParams): AsyncIterableIterator<Schemas['RegionsListResponse']>;
+		/** Iterate every region across all pages. */
+		listAll(params?: RegionsListParams): AsyncIterableIterator<Schemas['RegionEntry']>;
 	};
 	stats: {
 		get(): Promise<Schemas['StatsResponse']>;
@@ -389,6 +407,20 @@ export function createClient(options: ClientOptions): QuizbaseClient {
 				pages: (params) => paginate(list, params),
 				listAll: (params) => paginateItems(list, params)
 			} satisfies QuizbaseClient['subcategories'];
+		})(),
+		regions: (() => {
+			const list = (params?: RegionsListParams) =>
+				request<Schemas['RegionsListResponse']>({
+					endpoint: 'regions.list',
+					method: 'GET',
+					path: '/api/v1/regions',
+					query: params
+				});
+			return {
+				list,
+				pages: (params) => paginate(list, params),
+				listAll: (params) => paginateItems(list, params)
+			} satisfies QuizbaseClient['regions'];
 		})(),
 		stats: {
 			get: () =>

@@ -48,6 +48,7 @@ client.topics.list({ lang });
 client.topics.get(slug, { lang });
 client.tags.list({ lang });
 client.subcategories.list({ lang });
+client.regions.list({ lang, kind, q });
 
 client.stats.get();
 client.me.get();
@@ -62,7 +63,7 @@ Full parameter docs: [docs.quizbase.runriva.com/docs](https://quizbase.runriva.c
 
 ## Pagination
 
-`questions`, `topics`, `tags`, and `subcategories` are cursor-paginated. Use `listAll()` to iterate every item, or `pages()` to iterate page-by-page — both auto-follow `_links.next` and preserve filters across pages.
+`questions`, `topics`, `tags`, `subcategories`, and `regions` are cursor-paginated. Use `listAll()` to iterate every item, or `pages()` to iterate page-by-page — both auto-follow `_links.next` and preserve filters across pages.
 
 ```ts
 // Iterate every matching question. Filters and limit are reused on each page.
@@ -129,6 +130,43 @@ Use `qb_sk_*` (secret key) from your server to fetch full questions including `c
 Save `{id, lang}` as your card key. When the upstream question changes (typo fix, distractor swap, translation refresh), `questions.get(id, { lang })` returns the updated content under the same id — your card auto-updates without re-import. Soft-deleted questions return 404; treat that as "card removed upstream".
 
 Full code samples and edge cases at [/docs/api/questions-by-id § What you can do with a stable id](https://quizbase.runriva.com/docs/api/questions-by-id). For MCP agents, the same playbook is exposed as the `client_mechanics_patterns` prompt.
+
+## Regions: cultural affinity, not geography
+
+The `regions` field marks **cultural affinity** — residents of a country or members of a cultural/religious group are *statistically more likely to know* the answer. It is **not** a tag for "this question is about country X". The Mona Lisa is universally accessible (`regions: []`), but a question requiring NFL knowledge has `regions: ["us"]`.
+
+Values:
+
+- **Country codes** — ISO 3166-1 alpha-2 lowercase (`us`, `pl`, `gb`, `de`, `jp`, …)
+- **Cultural codes** — `jewish`, `christian-catholic`, `islam`
+
+```ts
+// US-relevant questions (NFL, US presidents, Super Bowl)
+const { data } = await client.questions.random({ regions: ['us'], amount: 5 });
+
+// Catholic doctrine
+const { data } = await client.questions.random({ regions: ['christian-catholic'] });
+
+// AND-logic: both Polish AND Catholic
+const { data } = await client.questions.random({
+	regions: ['pl', 'christian-catholic']
+});
+
+// Discover the full catalog (~150 codes per language)
+const { data: regions } = await client.regions.list({ lang: 'en', kind: 'cultural' });
+// [
+//   { code: 'jewish', kind: 'cultural', label: 'Jewish (cultural/religious)', count: 2698 },
+//   { code: 'christian-catholic', kind: 'cultural', label: 'Catholic Christian (cultural/religious)', count: 2859 },
+//   { code: 'islam', kind: 'cultural', label: 'Islamic (cultural/religious)', count: 784 }
+// ]
+
+// Native labels for `lang=pl`: pl → "Polska", jp → "日本"
+for await (const region of client.regions.listAll({ lang: 'pl' })) {
+	console.log(region.code, region.label, region.count);
+}
+```
+
+Input is **case-insensitive** (`'PL'` and `'pl'` both work — normalized server-side). Output is always lowercase. See [the regions docs](https://quizbase.runriva.com/docs/api/regions) for the full catalog with counts.
 
 ## Errors
 

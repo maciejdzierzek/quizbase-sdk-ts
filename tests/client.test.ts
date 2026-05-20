@@ -313,6 +313,31 @@ describe('pagination', () => {
 		expect(fetchMock).toHaveBeenCalledOnce();
 	});
 
+	it('regions.list + regions.listAll wire through the same paginator', async () => {
+		const regionsMock = vi.fn(async () =>
+			jsonResponse(200, {
+				data: [
+					{ code: 'us', kind: 'country', label: 'United States', count: 309090 },
+					{ code: 'jewish', kind: 'cultural', label: 'Jewish (cultural/religious)', count: 2698 }
+				],
+				meta: { count: 2, total: 152, language: 'en', requestId: 'req_test' },
+				_links: {}
+			})
+		);
+		const client = createClient({ apiKey: 'qb_pk_x', fetch: regionsMock as typeof fetch });
+
+		const single = await client.regions.list({ lang: 'en', kind: 'cultural' });
+		expect(single.data.map((r) => r.code)).toEqual(['us', 'jewish']);
+		expect(single.data[0]?.kind).toBe('country');
+		expect(single.data[1]?.kind).toBe('cultural');
+
+		const codes: string[] = [];
+		for await (const r of client.regions.listAll({ lang: 'en' })) {
+			codes.push(r.code);
+		}
+		expect(codes).toEqual(['us', 'jewish']);
+	});
+
 	it('topics.pages and subcategories.listAll wire through the same paginator', async () => {
 		const topicsMock = vi.fn(async () =>
 			jsonResponse(200, { data: [{ slug: 't1' }], meta: {}, _links: {} })
