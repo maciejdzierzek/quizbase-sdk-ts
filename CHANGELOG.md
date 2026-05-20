@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.4.1...v0.5.0) (2026-05-20)
+
+
+### Features
+
+* regenerate types from upstream OpenAPI — `quality` field + cleanup ([5df4d80](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/5df4d803a0a9e62bd04c2455f8ec5c729b1b1606))
+
 ## [0.4.1](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.4.0...v0.4.1) (2026-05-19)
 
 
