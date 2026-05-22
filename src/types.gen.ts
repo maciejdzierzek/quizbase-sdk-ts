@@ -907,7 +907,7 @@ export interface paths {
                     /** @description ISO 8601 datetime — only questions modified after this point. */
                     updated_since?: string;
                     category?: string;
-                    difficulty?: "easy" | "medium" | "hard";
+                    difficulty?: "trivial" | "easy" | "medium" | "hard" | "expert";
                     type?: "multiple" | "boolean" | "text_input";
                     tags?: string;
                     tags_any?: string;
@@ -1010,7 +1010,7 @@ export interface paths {
                     /** @description Display language for category names + slug labels (subcategories/tags) */
                     lang?: "en" | "pl";
                     category?: string;
-                    difficulty?: "easy" | "medium" | "hard";
+                    difficulty?: "trivial" | "easy" | "medium" | "hard" | "expert";
                     type?: "multiple" | "boolean" | "text_input";
                     tags?: string;
                     tags_any?: string;
@@ -1260,7 +1260,7 @@ export interface components {
              * @example easy
              * @enum {string|null}
              */
-            difficulty: "easy" | "medium" | "hard" | null;
+            difficulty: "trivial" | "easy" | "medium" | "hard" | "expert" | null;
             /** @example pl */
             language: string;
             category: components["schemas"]["CategoryRef"];
@@ -1422,6 +1422,8 @@ export interface components {
             byDifficulty: components["schemas"]["StatsByDifficulty"];
             byTopic: components["schemas"]["StatsTopicEntry"][];
             byTag: components["schemas"]["StatsTagEntry"][];
+            topRegions: components["schemas"]["StatsTopRegions"];
+            byQualityHigh: components["schemas"]["StatsByQualityHigh"];
             meta: components["schemas"]["MetaStats"];
         };
         StatsCategoryEntry: {
@@ -1432,15 +1434,19 @@ export interface components {
             /** @example 146384 */
             count: number;
         };
-        /** @description Difficulty distribution. Pre-launch zero-filled — snapshot pipeline gap. */
+        /** @description Difficulty distribution across 5 LLM-calibrated levels (Plan 121) plus `unrated` for pre-rescore records. */
         StatsByDifficulty: {
-            /** @example 0 */
+            /** @example 12480 */
+            trivial: number;
+            /** @example 73215 */
             easy: number;
-            /** @example 0 */
+            /** @example 580212 */
             medium: number;
-            /** @example 0 */
+            /** @example 142098 */
             hard: number;
-            /** @example 0 */
+            /** @example 12476 */
+            expert: number;
+            /** @example 473528 */
             unrated: number;
         };
         StatsTopicEntry: {
@@ -1458,6 +1464,22 @@ export interface components {
             label: string;
             /** @example 15281 */
             count: number;
+        };
+        /** @description Top regions by cultural affinity (Plan 120). Code = ISO 3166-1 alpha-2 or cultural identifier; not a geographic filter — indicates "person from this region has higher statistical chance to answer correctly". */
+        StatsTopRegions: {
+            /** @example us */
+            code: string;
+            /** @example United States */
+            label: string;
+            /** @example 309090 */
+            count: number;
+        }[];
+        /** @description Counts of records eligible for `?quality=high` filter (Plan 121: needs_review=false AND content_grade != 0) per language. */
+        StatsByQualityHigh: {
+            /** @example 329266 */
+            en: number;
+            /** @example 491297 */
+            pl: number;
         };
         MetaStats: {
             /** @example 2026-05-05T16:32:09.001Z */
@@ -1579,7 +1601,7 @@ export interface components {
             /** @enum {string} */
             type: "multiple" | "boolean" | "text_input";
             /** @enum {string|null} */
-            difficulty: "easy" | "medium" | "hard" | null;
+            difficulty: "trivial" | "easy" | "medium" | "hard" | "expert" | null;
             language: string;
         };
         MetaBasic: {
