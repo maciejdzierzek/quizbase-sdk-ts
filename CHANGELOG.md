@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.7.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.6.0...v0.7.0) (2026-05-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* difficulty enum 5-level + StatsResponse v3 fields (topRegions, byQualityHigh)
+
+### Features
+
+* difficulty enum 5-level + StatsResponse v3 fields (topRegions, byQualityHigh) ([03daaea](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/03daaeabc14f1f5bbfa0b7cd694c7a06abfbae8f))
+
+
+### Miscellaneous Chores
+
+* trigger Release-As 0.7.0 (override pre-1.0 major bump) ([623f220](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/623f2203e7ba6bdce1bccc9049dc7a128bd87748))
+
 ## [0.6.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.5.0...v0.6.0) (2026-05-20)
 
 
