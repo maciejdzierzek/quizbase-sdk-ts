@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.7.0...v0.8.0) (2026-05-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* ?count=exact removed from /api/v1/questions
+
+### Features
+
+* regen types — ?count=exact removed (QuizBase Plan 129 § S5) ([44ce96e](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/44ce96ee1c660fa2d7a52a290d20019e10624398))
+
+
+### Miscellaneous Chores
+
+* trigger Release-As 0.8.0 (override pre-1.0 major bump) ([7a71817](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/7a718178bdd123b3e1c1b8f031bdfd65b3ccf218))
+
 ## [0.7.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.6.0...v0.7.0) (2026-05-22)
 
 
