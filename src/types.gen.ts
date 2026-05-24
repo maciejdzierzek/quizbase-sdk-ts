@@ -920,7 +920,7 @@ export interface paths {
                     regions?: string;
                     source?: "arc" | "creak" | "entityq" | "kqa-pro" | "mintaka" | "mkqa" | "nq-open" | "opentdb" | "opentriviaqa" | "qasc" | "quizbase" | "webq";
                     license?: "CC-BY-SA-4.0" | "CC-BY-SA-3.0" | "CC-BY-4.0" | "MIT" | "proprietary";
-                    count?: "estimate" | "exact" | "none";
+                    count?: "estimate" | "none";
                 };
                 header?: never;
                 path?: never;
@@ -1861,12 +1861,7 @@ export interface components {
              */
             count: number;
             /**
-             * @description Total matching items (when `count=exact`).
-             * @example 1294009
-             */
-            total?: number;
-            /**
-             * @description Planner-estimated total (default `count=estimate`).
+             * @description Planner-estimated total (default `count=estimate`, ±5-50% accuracy).
              * @example 545379
              */
             totalEstimate?: number;
@@ -1875,7 +1870,7 @@ export interface components {
              * @example estimate
              * @enum {string}
              */
-            countMode?: "estimate" | "exact" | "none";
+            countMode?: "estimate" | "none";
             /**
              * @description Language of the response content.
              * @example en
