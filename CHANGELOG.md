@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.9.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.8.0...v0.9.0) (2026-05-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* meta.totalEstimate removed; use meta.total with ?count=exact. count default is now 'none' (was 'estimate' — page via cursor + nextCursor).
+
+### Features
+
+* meta.total (exact count) replaces meta.totalEstimate ([b50c3ab](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/b50c3ab6a037c9c5d95d018e6943f664a2385e33))
+
+
+### Miscellaneous Chores
+
+* trigger Release-As 0.9.0 (override pre-1.0 major bump) ([991ee24](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/991ee2422da2d84f06256309d84eaca8c1b24725))
+
 ## [0.8.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.7.0...v0.8.0) (2026-05-24)
 
 
