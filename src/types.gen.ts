@@ -581,7 +581,7 @@ export interface paths {
         };
         /**
          * List region codes (cultural affinity)
-         * @description Discovery dla `regions` filter. **Cultural affinity** — pytanie ma code regionu, jeśli mieszkańcy kraju lub członkowie grupy kulturowej/religijnej są statystycznie częściej w stanie odpowiedzieć (NIE geografia tematu pytania). Lowercase ISO 3166-1 alpha-2 (`us`, `pl`, `gb`) + cultural codes (`jewish`, `christian-catholic`, `islam` — LLM schema whitelist parity). Sourced z `mv_region_counts` (pre-aggregated TABLE). Cardinality ~150 distinct codes per language.
+         * @description Discovery dla `regions` filter. **Cultural affinity** — pytanie ma code regionu, jeśli mieszkańcy kraju lub członkowie grupy kulturowej/religijnej są statystycznie częściej w stanie odpowiedzieć (NIE geografia tematu pytania). Lowercase ISO 3166-1 alpha-2 (`us`, `pl`, `gb`) + cultural codes (`jewish`, `christian-catholic`, `islam` — LLM schema whitelist parity). Sourced from a pre-aggregated table. Cardinality ~150 distinct codes per language.
          */
         get: {
             parameters: {
@@ -914,13 +914,13 @@ export interface paths {
                     topic?: string;
                     topics_any?: string;
                     subcategory?: string;
-                    /** @description Quality preset: "high" (default) skips needs_review=true; "all" includes everything */
+                    /** @description Quality preset: "high" (default) skips questions flagged for review; "all" includes everything */
                     quality?: "high" | "all";
                     /** @description Cultural affinity codes. A question is tagged with a region if residents of that country, or members of that cultural/religious group, are statistically more likely to know the answer (NOT geography of the subject). Lowercase ISO 3166-1 alpha-2 (e.g. `us`, `pl`, `gb`) plus cultural codes (`jewish`, `christian-catholic`, `islam`). AND-logic. Empty array on a question = universally accessible (no cultural advantage). Discover via `GET /api/v1/regions`. Uppercase tolerated on input (normalized to lowercase). */
                     regions?: string;
                     source?: "arc" | "creak" | "entityq" | "kqa-pro" | "mintaka" | "mkqa" | "nq-open" | "opentdb" | "opentriviaqa" | "qasc" | "quizbase" | "webq";
                     license?: "CC-BY-SA-4.0" | "CC-BY-SA-3.0" | "CC-BY-4.0" | "MIT" | "proprietary";
-                    count?: "estimate" | "none";
+                    count?: "exact" | "none";
                 };
                 header?: never;
                 path?: never;
@@ -1017,7 +1017,7 @@ export interface paths {
                     topic?: string;
                     topics_any?: string;
                     subcategory?: string;
-                    /** @description Quality preset: "high" (default) skips needs_review=true; "all" includes everything */
+                    /** @description Quality preset: "high" (default) skips questions flagged for review; "all" includes everything */
                     quality?: "high" | "all";
                     /** @description Cultural affinity codes. A question is tagged with a region if residents of that country, or members of that cultural/religious group, are statistically more likely to know the answer (NOT geography of the subject). Lowercase ISO 3166-1 alpha-2 (e.g. `us`, `pl`, `gb`) plus cultural codes (`jewish`, `christian-catholic`, `islam`). AND-logic. Empty array on a question = universally accessible (no cultural advantage). Discover via `GET /api/v1/regions`. Uppercase tolerated on input (normalized to lowercase). */
                     regions?: string;
@@ -1434,7 +1434,7 @@ export interface components {
             /** @example 146384 */
             count: number;
         };
-        /** @description Difficulty distribution across 5 LLM-calibrated levels (Plan 121) plus `unrated` for pre-rescore records. */
+        /** @description Difficulty distribution across 5 LLM-calibrated levels plus `unrated` for records not yet LLM-rated. */
         StatsByDifficulty: {
             /** @example 12480 */
             trivial: number;
@@ -1465,7 +1465,7 @@ export interface components {
             /** @example 15281 */
             count: number;
         };
-        /** @description Top regions by cultural affinity (Plan 120). Code = ISO 3166-1 alpha-2 or cultural identifier; not a geographic filter — indicates "person from this region has higher statistical chance to answer correctly". */
+        /** @description Top regions by cultural affinity. Code = ISO 3166-1 alpha-2 or cultural identifier; not a geographic filter — indicates "person from this region has higher statistical chance to answer correctly". */
         StatsTopRegions: {
             /** @example us */
             code: string;
@@ -1474,7 +1474,7 @@ export interface components {
             /** @example 309090 */
             count: number;
         }[];
-        /** @description Counts of records eligible for `?quality=high` filter (Plan 121: needs_review=false AND content_grade != 0) per language. */
+        /** @description Counts of records eligible for the `?quality=high` filter per language. */
         StatsByQualityHigh: {
             /** @example 329266 */
             en: number;
@@ -1861,16 +1861,16 @@ export interface components {
              */
             count: number;
             /**
-             * @description Planner-estimated total (default `count=estimate`, ±5-50% accuracy).
+             * @description Exact count of matching questions. Present only when `count=exact`. Omitted by default — page via cursor + `_links.next`.
              * @example 545379
              */
-            totalEstimate?: number;
+            total?: number;
             /**
              * @description Echo of the `count` query param.
-             * @example estimate
+             * @example none
              * @enum {string}
              */
-            countMode?: "estimate" | "none";
+            countMode?: "exact" | "none";
             /**
              * @description Language of the response content.
              * @example en
