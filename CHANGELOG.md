@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.9.0...v0.10.0) (2026-06-15)
+
+
+### Features
+
+* batch questions.getByIds + questions.mapToLanguage ([f129144](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/f129144577384274de164e5037f52894ad461553))
+
 ## [0.9.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.8.0...v0.9.0) (2026-05-30)
 
 
