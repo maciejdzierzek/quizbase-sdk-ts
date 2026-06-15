@@ -58,6 +58,7 @@ export interface ClientOptions {
 }
 
 type QuestionsListParams = paths['/api/v1/questions']['get']['parameters']['query'];
+type QuestionsListQuery = NonNullable<QuestionsListParams>;
 type TopicsListParams = paths['/api/v1/topics']['get']['parameters']['query'];
 type TagsListParams = paths['/api/v1/tags']['get']['parameters']['query'];
 type SubcategoriesListParams = paths['/api/v1/subcategories']['get']['parameters']['query'];
@@ -73,6 +74,27 @@ export interface QuizbaseClient {
 			id: string,
 			params?: paths['/api/v1/questions/{id}']['get']['parameters']['query']
 		): Promise<Schemas['QuestionByIdResponse']>;
+		/**
+		 * Fetch up to 250 questions by id in a single call — anti-repeat, deep-links,
+		 * reconstructing a saved set. Returns the exact records (in their own language).
+		 * Ids with no live record are reported in `meta.missing`. Results are ordered to
+		 * match the requested `ids`.
+		 */
+		getByIds(
+			ids: string[],
+			params?: Omit<QuestionsListQuery, 'ids'>
+		): Promise<Schemas['QuestionsListResponse']>;
+		/**
+		 * Map a set of questions to another content language across the translation
+		 * chain — e.g. swap an English set to Polish keeping the same questions. For
+		 * each id the sibling record in `contentLanguage` is returned, matched by
+		 * canonical root. Ids without a translation are reported in `meta.missing`.
+		 */
+		mapToLanguage(
+			ids: string[],
+			contentLanguage: NonNullable<QuestionsListQuery['content_language']>,
+			params?: Omit<QuestionsListQuery, 'ids' | 'content_language'>
+		): Promise<Schemas['QuestionsListResponse']>;
 		/** Iterate every page of `/questions`, auto-following `_links.next`. */
 		pages(params?: QuestionsListParams): AsyncIterableIterator<Schemas['QuestionsListResponse']>;
 		/** Iterate every question across all pages. */
@@ -338,6 +360,12 @@ export function createClient(options: ClientOptions): QuizbaseClient {
 						path: `/api/v1/questions/${encodeURIComponent(id)}`,
 						query: params
 					}),
+				// `ids` must be a single CSV value (server reads one param); join here
+				// rather than letting buildUrl emit repeated `ids=` keys.
+				getByIds: (ids, params) =>
+					list({ ...params, ids: ids.join(',') }),
+				mapToLanguage: (ids, contentLanguage, params) =>
+					list({ ...params, ids: ids.join(','), content_language: contentLanguage }),
 				pages: (params) => paginate(list, params),
 				listAll: (params) => paginateItems(list, params)
 			} satisfies QuizbaseClient['questions'];

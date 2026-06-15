@@ -895,7 +895,7 @@ export interface paths {
         };
         /**
          * Browse questions (cursor pagination)
-         * @description Paginated browse with filters and delta-sync via `updated_since`.
+         * @description Paginated browse with filters and delta-sync via `updated_since`. **Batch by `ids`** (up to 250, comma-separated UUIDs) fetches those exact records in a single call — anti-repeat, deep-links. Add **`content_language`** to map a set across the translation chain (e.g. an English set to Polish): for each id the sibling record in that language is returned, matched by canonical root. `ids` is a terminal selector (browse filters and cursor are ignored). Unresolved ids are reported in `meta.missing`, never dropped silently.
          */
         get: {
             parameters: {
@@ -921,6 +921,9 @@ export interface paths {
                     source?: "arc" | "creak" | "entityq" | "kqa-pro" | "mintaka" | "mkqa" | "nq-open" | "opentdb" | "opentriviaqa" | "qasc" | "quizbase" | "webq";
                     license?: "CC-BY-SA-4.0" | "CC-BY-SA-3.0" | "CC-BY-4.0" | "MIT" | "proprietary";
                     count?: "exact" | "none";
+                    ids?: string;
+                    /** @description Content language of returned records (translation mapping when combined with `ids`) */
+                    content_language?: "en" | "pl";
                 };
                 header?: never;
                 path?: never;
@@ -1871,6 +1874,11 @@ export interface components {
              * @enum {string}
              */
             countMode?: "exact" | "none";
+            /**
+             * @description Requested `ids` with no result — not found / not live, or (in translation mapping via `content_language`) no record in that language. Present only on `ids` batch requests, and only when something was missing.
+             * @example []
+             */
+            missing?: string[];
             /**
              * @description Language of the response content.
              * @example en

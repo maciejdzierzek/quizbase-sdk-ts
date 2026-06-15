@@ -363,6 +363,42 @@ describe('pagination', () => {
 	});
 });
 
+describe('questions batch by ids (Plan 153)', () => {
+	it('getByIds sends ids as a single CSV value (not repeated keys)', async () => {
+		const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+			const url = new URL(String(input));
+			// One CSV param — server reads a single `ids`, repeated keys would lose all but last.
+			expect(url.searchParams.getAll('ids')).toEqual(['a,b,c']);
+			expect(url.searchParams.has('content_language')).toBe(false);
+			return jsonResponse(200, {
+				data: [{ id: 'a' }, { id: 'b' }],
+				meta: { count: 2, language: 'en', requestId: 'r', missing: ['c'] }
+			});
+		});
+		const client = createClient({ apiKey: 'qb_pk_x', fetch: fetchMock as typeof fetch });
+		const res = await client.questions.getByIds(['a', 'b', 'c']);
+		expect(res.data.map((q) => (q as { id: string }).id)).toEqual(['a', 'b']);
+		expect(res.meta.missing).toEqual(['c']);
+	});
+
+	it('mapToLanguage sends ids CSV + content_language', async () => {
+		const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+			const url = new URL(String(input));
+			expect(url.searchParams.getAll('ids')).toEqual(['en1,en2']);
+			expect(url.searchParams.get('content_language')).toBe('pl');
+			expect(url.searchParams.get('lang')).toBe('pl');
+			return jsonResponse(200, {
+				data: [{ id: 'pl1', language: 'pl', rootQuestionId: 'en1' }],
+				meta: { count: 1, language: 'pl', requestId: 'r', missing: ['en2'] }
+			});
+		});
+		const client = createClient({ apiKey: 'qb_pk_x', fetch: fetchMock as typeof fetch });
+		const res = await client.questions.mapToLanguage(['en1', 'en2'], 'pl', { lang: 'pl' });
+		expect(res.data).toHaveLength(1);
+		expect(res.meta.missing).toEqual(['en2']);
+	});
+});
+
 describe('integration (prod)', () => {
 	const key = process.env.QUIZBASE_TEST_KEY;
 	const skip = !key;

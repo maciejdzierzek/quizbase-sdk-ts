@@ -41,6 +41,8 @@ Use `qb_pk_*` (publishable) from browsers and edge functions — CORS is enabled
 client.questions.list({ category, tags_any, topics_any, subcategory, lang, cursor, limit, ... });
 client.questions.random({ category, tags, lang, ... });
 client.questions.get(id, { lang });
+client.questions.getByIds([id1, id2, ...]);                 // batch by id (≤250) — exact records
+client.questions.mapToLanguage([id1, id2, ...], 'pl');      // same set in another language
 
 client.categories.list({ lang });
 client.languages.list();
@@ -83,19 +85,30 @@ Need manual control? `list()` still exposes `_links.next` and a `cursor` query p
 
 Every question carries a stable UUID v7 `id` that never changes after import. The SDK is intentionally **thin** — no `?seed=`, no `?daily=`, no built-in deduplication. The stable id is the primitive you compose into mechanics. Six patterns cover most real apps:
 
-### Same question across languages
+### Same questions across languages — swap a whole set
+
+Draw a set once, then map it to another **content** language with one call. `mapToLanguage`
+returns the sibling record per id across the translation chain (not a re-draw), so a user
+switching EN ↔ PL keeps the exact same questions. Missing translations are reported in
+`meta.missing`, never dropped silently.
 
 ```ts
-const en = await client.questions.random({ lang: 'en' });
-const id = en.data[0].id;
-const pl = await client.questions.get(id, { lang: 'pl' });
-const es = await client.questions.get(id, { lang: 'es' });
-// Same canonical question, three languages — UUID is the link.
+const en = await client.questions.random({ lang: 'en', amount: 20 });
+const ids = en.data.map((q) => q.id);
+
+const pl = await client.questions.mapToLanguage(ids, 'pl');
+// pl.data — the same 20 questions, in Polish (matched by canonical root)
+// pl.meta.missing — ids with no Polish translation (leave the original for those)
 ```
 
-### Don't repeat — exclude seen questions
+> `content_language` is the language of the question **text** (a different record).
+> `lang` only localizes display labels (category/tag names). Pass `ids` (the ids you hold)
+> — the server resolves the translation family; you don't need `rootQuestionId`.
+
+### Don't repeat — exclude seen, or reconstruct a saved set
 
 ```ts
+// Anti-repeat within a draw (≤250 UUIDs):
 const seen = new Set<string>();
 const batch = await client.questions.random({
   category: 'science-and-nature',
@@ -103,9 +116,13 @@ const batch = await client.questions.random({
   exclude: [...seen]
 });
 batch.data.forEach((q) => seen.add(q.id));
+
+// Reconstruct a saved set after refresh/restart (one call, exact records):
+const restored = await client.questions.getByIds([...seen]);
 ```
 
-`exclude` accepts up to 250 UUIDs. For longer histories keep `seen` client-side and filter after the fetch.
+`exclude` and `getByIds` each accept up to 250 UUIDs. For longer histories keep `seen`
+client-side and filter after the fetch.
 
 ### Daily challenge — same question for everyone today
 
@@ -119,7 +136,7 @@ const todays = pool.data[Math.abs(idx) % pool.data.length];
 
 ### Multiplayer sync — both players see the same question
 
-Your matchmaker picks one `id` (via `random` or `list`), broadcasts to both clients, and both clients call `questions.get(id, { lang })`. Same UUID, per-player language preference. Zero state on QuizBase — your matchmaker owns the round.
+Your matchmaker picks one `id` (via `random` or `list`), broadcasts to both clients, and both clients call `questions.get(id)`. For per-player language, map the round's ids once with `questions.mapToLanguage(ids, playerLang)`. Same canonical question, zero state on QuizBase — your matchmaker owns the round.
 
 ### Server-side anti-cheat — never ship `correctAnswer` to the client
 
