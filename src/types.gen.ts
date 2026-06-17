@@ -914,11 +914,14 @@ export interface paths {
                     topic?: string;
                     topics_any?: string;
                     subcategory?: string;
-                    /** @description Quality preset: "high" (default) skips questions flagged for review; "all" includes everything */
-                    quality?: "high" | "all";
+                    /** @description Quality preset: "high" (default) = cleanest, most broadly-useful questions; "standard" = broader pool incl. niche; "all" = everything incl. flagged-for-review */
+                    quality?: "high" | "standard" | "all";
                     /** @description Cultural affinity codes. A question is tagged with a region if residents of that country, or members of that cultural/religious group, are statistically more likely to know the answer (NOT geography of the subject). Lowercase ISO 3166-1 alpha-2 (e.g. `us`, `pl`, `gb`) plus cultural codes (`jewish`, `christian-catholic`, `islam`). AND-logic. Empty array on a question = universally accessible (no cultural advantage). Discover via `GET /api/v1/regions`. Uppercase tolerated on input (normalized to lowercase). */
                     regions?: string;
-                    source?: "arc" | "creak" | "entityq" | "kqa-pro" | "mintaka" | "mkqa" | "nq-open" | "opentdb" | "opentriviaqa" | "qasc" | "quizbase" | "webq";
+                    /** @description Filter by source database — one or more of: arc, creak, entityq, kqa-pro, mintaka, mkqa, nq-open, opentdb, opentriviaqa, qasc, quizbase, webq. Comma-separated for multiple (include / OR). Matches `attribution.source` per question. */
+                    source?: string;
+                    /** @description Exclude one or more source databases (comma-separated). Use to drop noisy auto-generated sources, e.g. `exclude_source=entityq`. Applied after `source` if both are present. */
+                    exclude_source?: string;
                     license?: "CC-BY-SA-4.0" | "CC-BY-SA-3.0" | "CC-BY-4.0" | "MIT" | "proprietary";
                     count?: "exact" | "none";
                     ids?: string;
@@ -1020,11 +1023,14 @@ export interface paths {
                     topic?: string;
                     topics_any?: string;
                     subcategory?: string;
-                    /** @description Quality preset: "high" (default) skips questions flagged for review; "all" includes everything */
-                    quality?: "high" | "all";
+                    /** @description Quality preset: "high" (default) = cleanest, most broadly-useful questions; "standard" = broader pool incl. niche; "all" = everything incl. flagged-for-review */
+                    quality?: "high" | "standard" | "all";
                     /** @description Cultural affinity codes. A question is tagged with a region if residents of that country, or members of that cultural/religious group, are statistically more likely to know the answer (NOT geography of the subject). Lowercase ISO 3166-1 alpha-2 (e.g. `us`, `pl`, `gb`) plus cultural codes (`jewish`, `christian-catholic`, `islam`). AND-logic. Empty array on a question = universally accessible (no cultural advantage). Discover via `GET /api/v1/regions`. Uppercase tolerated on input (normalized to lowercase). */
                     regions?: string;
-                    source?: "arc" | "creak" | "entityq" | "kqa-pro" | "mintaka" | "mkqa" | "nq-open" | "opentdb" | "opentriviaqa" | "qasc" | "quizbase" | "webq";
+                    /** @description Filter by source database — one or more of: arc, creak, entityq, kqa-pro, mintaka, mkqa, nq-open, opentdb, opentriviaqa, qasc, quizbase, webq. Comma-separated for multiple (include / OR). Matches `attribution.source` per question. */
+                    source?: string;
+                    /** @description Exclude one or more source databases (comma-separated). Use to drop noisy auto-generated sources, e.g. `exclude_source=entityq`. Applied after `source` if both are present. */
+                    exclude_source?: string;
                     license?: "CC-BY-SA-4.0" | "CC-BY-SA-3.0" | "CC-BY-4.0" | "MIT" | "proprietary";
                     exclude?: string;
                 };
