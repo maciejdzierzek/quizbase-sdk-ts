@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.10.0...v0.11.0) (2026-06-17)
+
+
+### Features
+
+* multi-value source + exclude_source, quality=standard tier ([bc41c40](https://github.com/maciejdzierzek/quizbase-sdk-ts/commit/bc41c40f5803378536cb7f074c552e70e54ea952))
+
 ## [0.10.0](https://github.com/maciejdzierzek/quizbase-sdk-ts/compare/v0.9.0...v0.10.0) (2026-06-15)
 
 
